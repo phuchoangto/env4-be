@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum HostType {
+  PHYSICAL
+  KVM
+  GNS3_VM
+}
+
+model Environment {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  hosts       Host[]
+}
+
+model Host {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  type          HostType?
+  publicIp      String?
+  privateIp     String?
+  sshUser       String?
+  sshPort       Int?
+  sshPass       String?
+  os            String?
+  cpu           Int?
+  ram           Int?
+  disk          Int?
+  description   String?
+  services      Service[]
+  environment   Environment @relation(fields: [environmentId], references: [id])
+  environmentId String      @db.ObjectId
+}
+
+model Service {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  description   String?
+  host          Host   @relation(fields: [hostId], references: [id])
+  hostId        String @db.ObjectId
+  publicAccess  String?
+  privateAccess String?
+  credentials   String?
+}
