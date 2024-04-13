@@ -19,8 +19,20 @@ export class EnvironmentsController {
   constructor(private readonly environmentsService: EnvironmentsService) {}
 
   @Get()
-  async findAll(@Query() query) {
-    return this.environmentsService.findAll(query);
+  async findAll(
+    @Query('skip') skip?: string,
+    @Query('take') take?: string,
+    @Query('cursor') cursor?: string,
+    @Query('where') where?: string,
+    @Query('orderBy') orderBy?: string,
+  ) {
+    return this.environmentsService.findAll({
+      skip: skip ? +skip : undefined,
+      take: take ? +take : undefined,
+      cursor: cursor ? { id: cursor } : undefined,
+      where: where ? JSON.parse(where) : undefined,
+      orderBy: orderBy ? JSON.parse(orderBy) : undefined,
+    });
   }
 
   @Get(':id')
